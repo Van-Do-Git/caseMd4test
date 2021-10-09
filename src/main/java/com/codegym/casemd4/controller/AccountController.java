@@ -57,11 +57,15 @@ public class AccountController {
         return new ResponseEntity<>(servicePost.findAll(), HttpStatus.OK);
     }
 
+    @GetMapping("/findPost/{idPost}")
+    public ResponseEntity<Post> findPostById(@PathVariable("idPost") Long idPost) {
+        Post post = servicePost.findById(idPost).get();
+        return new ResponseEntity<>(post, HttpStatus.OK);
+    }
+
     @PostMapping("/timeline")
     public ResponseEntity<Page<Post>> timeline(@RequestBody String page) {
         String[] sortById = new String[2];
-        sortById[0] = "id";
-        sortById[0] = "desc";
         Pageable pageable = PageRequest.of(Integer.parseInt(page), 20, Sort.by("id").descending());
         Page<Post> postPage = servicePost.findAll(pageable);
         return new ResponseEntity<>(postPage, HttpStatus.OK);
@@ -74,7 +78,7 @@ public class AccountController {
     }
 
     @GetMapping("/likeshow/{idAcc}/{idPost}")
-    public ResponseEntity<Post> createlike(@PathVariable("idAcc") Long idAcc, @PathVariable("idPost") Long idPost) {
+    public ResponseEntity<?> createlike(@PathVariable("idAcc") Long idAcc, @PathVariable("idPost") Long idPost) {
         AccountLike accountLike = serviceLike.findByAccount_IdAndPost_Id(idAcc, idPost);
         if (accountLike != null) {
             Long idlike = accountLike.getId();
@@ -88,8 +92,7 @@ public class AccountController {
             serviceLike.save(accountLike1);
         }
         serviceLike.remove(accountLike.getId());
-        Post postNew = servicePost.findById(idPost).get();
-        return new ResponseEntity<>(postNew, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/comment/{idAcc}/{idPost}")
