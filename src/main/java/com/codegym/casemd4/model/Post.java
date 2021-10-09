@@ -1,5 +1,6 @@
 package com.codegym.casemd4.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import org.hibernate.annotations.LazyCollection;
@@ -20,19 +21,26 @@ public class Post {
     private String privacy;
     private Date timePost;
 
-    @OneToMany (cascade = CascadeType.ALL, mappedBy = "post")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "post")
     @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonManagedReference
     private List<Image> imageList;
 
-    @OneToMany (cascade = CascadeType.ALL, mappedBy = "post")
-    @LazyCollection (LazyCollectionOption.FALSE)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "post", orphanRemoval = true)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonManagedReference
     private List<AccountLike> likeList;
 
-    @OneToMany (cascade = CascadeType.ALL,mappedBy = "post")
-    @LazyCollection (LazyCollectionOption.FALSE)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "post", orphanRemoval = true)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonManagedReference
     private List<Comment> commentList;
 
     @ManyToOne
     private Account account;
 
+    @Override
+    public String toString() {
+        return "";
+    }
 }

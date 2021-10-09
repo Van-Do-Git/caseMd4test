@@ -14,6 +14,7 @@ public class Image {
     private String path;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "post_id")
     private Post post;
 

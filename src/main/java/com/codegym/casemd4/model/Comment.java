@@ -17,6 +17,7 @@ public class Comment {
     private Account account;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "post_id")
     private Post post;
 

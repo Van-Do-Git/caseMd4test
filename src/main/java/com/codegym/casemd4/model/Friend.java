@@ -11,10 +11,10 @@ public class Friend {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    private Account id_account;
+    private Account account;
 
     @ManyToOne
-    private Account id_friend;
+    private Account friend;
 
     private Boolean status;
 

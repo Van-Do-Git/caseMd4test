@@ -44,11 +44,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().antMatchers("/admin", "/account").permitAll();
+        http.authorizeRequests().antMatchers("/account").permitAll();
         http.antMatcher("/**").httpBasic().authenticationEntryPoint(restServicesEntryPoint()).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
                 .antMatchers("/admin/**").access("hasRole('ADMIN')")
-                .antMatchers("/account/**").access("hasRole('USER')").and()
+                .antMatchers("/user/**").access("hasRole('USER')").and()
                 .addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling().accessDeniedHandler(customAccessDeniedHandler());
         http.cors().and().csrf().disable();

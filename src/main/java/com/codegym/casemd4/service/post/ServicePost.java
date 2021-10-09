@@ -4,17 +4,20 @@ package com.codegym.casemd4.service.post;
 import com.codegym.casemd4.model.Post;
 import com.codegym.casemd4.repository.IPostRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
-public class ServicePost implements IServicePost{
+public class ServicePost implements IServicePost {
     @Autowired
     private IPostRepo postRepo;
+
     @Override
     public Iterable<Post> findAll() {
-        return postRepo.findAll() ;
+        return postRepo.findAll();
     }
 
     @Override
@@ -30,5 +33,19 @@ public class ServicePost implements IServicePost{
     @Override
     public void remove(Long id) {
         postRepo.deleteById(id);
+    }
+
+    public Post add(Post post) {
+        return postRepo.save(post);
+    }
+
+    @Override
+    public Page<Post> findAll(Pageable pageable) {
+        return postRepo.findAll(pageable);
+    }
+
+    @Override
+    public Page<Post> findPostByPrivacyContaining(String s, Pageable pageable) {
+        return postRepo.findPostByPrivacyContaining(s,pageable);
     }
 }

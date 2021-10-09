@@ -14,6 +14,7 @@ public class AccountLike {
 
     @ManyToOne
     @JoinColumn(name = "post_id")
+    @JsonBackReference
     private Post post;
 
     @ManyToOne

@@ -55,7 +55,9 @@ public class ServiceAccount implements IServiceAccount{
     public boolean add(Account account) {
         List<Account> listUser = accountRepo.findAll();
         for (Account userExist : listUser) {
-            if (account.getId() == userExist.getId() || StringUtils.equals(account.getEmail(), userExist.getEmail())) {
+            if (account.getId() == userExist.getId() ||
+                    StringUtils.equals(account.getEmail(), userExist.getEmail())||
+                    !StringUtils.equals(account.getPassword(),account.getRe_password())) {
                 return false;
             }
         }
