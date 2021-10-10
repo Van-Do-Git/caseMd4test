@@ -14,15 +14,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 
 @RestController
@@ -68,8 +67,8 @@ public class AccountController {
     @PostMapping("/timeline")
     public ResponseEntity<Page<Post>> timeline(@RequestBody String page) {
         String[] sortById = new String[2];
-        Pageable pageable = PageRequest.of(Integer.parseInt(page), 3, Sort.by("id").descending());
-        Page<Post> postPage = servicePost.findAll(pageable);
+        Pageable pageable = PageRequest.of(Integer.parseInt(page), 5, Sort.by("id").descending());
+        Page<Post> postPage = servicePost.findPostByPrivacyContaining("public",pageable);
         return new ResponseEntity<>(postPage, HttpStatus.OK);
     }
 
@@ -162,6 +161,50 @@ public class AccountController {
             }
         }
         return new ResponseEntity<>(accountList, HttpStatus.OK);
+    }
+
+    @GetMapping("/confirmfriend/{idAcc}/{idFriend}")
+    public ResponseEntity<String> confirmFriend(@PathVariable("idAcc") Long idAcc, @PathVariable("idFriend") Long idFriend) {
+        Account account = serviceAccount.findById(idAcc).get();
+        Account friend = serviceAccount.findById(idFriend).get();
+        Friend friend1 = serviceFriend.findByAccount_IdAndAccount_Id(account, friend);
+        Friend friend2 = serviceFriend.findByAccount_IdAndAccount_Id(friend, account);
+        if (friend1 != null) {
+            friend1.setStatus(true);
+            serviceFriend.save(friend1);
+        } else {
+            friend2.setStatus(true);
+            serviceFriend.save(friend2);
+        }
+        return new ResponseEntity<>("ok", HttpStatus.OK);
+    }
+
+    @GetMapping("/showpostfriend/{idFriend}")
+    public ResponseEntity<List<Post>> showPostFriend(@PathVariable("idFriend") Long idFriend) {
+        List<Post> postList = servicePost.findAllByAccount_IdAndPrivacyIsNotContaining(idFriend, "onlyme");
+        return new ResponseEntity<>(postList, HttpStatus.OK);
+    }
+
+    @GetMapping("/showuserdetail/{idAcc}")
+    public ResponseEntity<List<Post>> showUserDetail(@PathVariable("idAcc") Long idAcc) {
+        List<Post> postList = servicePost.findAllByAccount_Id(idAcc);
+        return new ResponseEntity<>(postList, HttpStatus.OK);
+    }
+
+    @PutMapping("/reloadAvatar/{idAcc}")
+    public ResponseEntity<String> reloadAvatar(@PathVariable("idAcc") Long idAcc, @RequestBody Image avatar) {
+        Account account = serviceAccount.findById(idAcc).get();
+        Post newPost = new Post();
+        newPost.setConten("Đã thay ảnh đại diện");
+        newPost.setTimePost(new Date());
+        newPost.setPrivacy("public");
+        newPost.setAccount(account);
+        Post post = servicePost.add(newPost);
+        Image newAvatar = serviceImage.add(avatar);
+        newAvatar.setPost(post);
+        account.setAvatar(newAvatar);
+        serviceAccount.save(account);
+        return new ResponseEntity<>("ok", HttpStatus.OK);
     }
 
 }

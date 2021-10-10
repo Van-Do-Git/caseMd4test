@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,6 +36,11 @@ public class ServicePost implements IServicePost {
         postRepo.deleteById(id);
     }
 
+    @Override
+    public List<Post> findAllByAccount_Id(Long idAcc) {
+        return postRepo.findAllByAccount_Id(idAcc);
+    }
+
     public Post add(Post post) {
         return postRepo.save(post);
     }
@@ -46,6 +52,11 @@ public class ServicePost implements IServicePost {
 
     @Override
     public Page<Post> findPostByPrivacyContaining(String s, Pageable pageable) {
-        return postRepo.findPostByPrivacyContaining(s,pageable);
+        return postRepo.findPostByPrivacyContaining(s, pageable);
+    }
+
+    @Override
+    public List<Post> findAllByAccount_IdAndPrivacyIsNotContaining(Long idAcc, String privacy) {
+        return postRepo.findAllByAccount_IdAndPrivacyIsNotContaining(idAcc, privacy);
     }
 }

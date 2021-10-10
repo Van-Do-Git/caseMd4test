@@ -30,4 +30,9 @@ public class ServiceImage implements IServiceImage{
     public void remove(Long id) {
         iImageRepo.deleteById(id);
     }
+
+    @Override
+    public Image add(Image post) {
+        return iImageRepo.save(post);
+    }
 }
