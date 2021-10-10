@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface IFriendRepo extends JpaRepository<Friend, Long> {
     @Query("select f from Friend f where f.account = ?1 and  f.friend = ?2")
-    Friend findByAccount_IdAndAccount_Id(Long idAcc, Long idFriend);
+    Friend findByAccount_IdAndAccount_Id(Account account, Account friend);
 
 
     @Query("select f from Friend f where f.account = ?1 and f.status = ?2 or f.friend = ?3 and f.status = ?4")

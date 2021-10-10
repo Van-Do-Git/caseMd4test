@@ -119,14 +119,14 @@ public class AccountController {
 
     @GetMapping("/sendaddfriend/{idAcc}/{idFriend}")
     public ResponseEntity<String> sendAddFriend(@PathVariable("idAcc") Long idAcc, @PathVariable("idFriend") Long idFriend) {
-        Friend friend = serviceFriend.findByAccount_IdAndAccount_Id(idAcc, idFriend);
-        Friend account = serviceFriend.findByAccount_IdAndAccount_Id(idFriend, idAcc);
-        if (friend == null && account == null) {
-            Account account1 = serviceAccount.findById(idAcc).get();
-            Account account2 = serviceAccount.findById(idFriend).get();
+        Account account = serviceAccount.findById(idAcc).get();
+        Account friend = serviceAccount.findById(idFriend).get();
+        Friend friend1 = serviceFriend.findByAccount_IdAndAccount_Id(account, friend);
+        Friend friend2 = serviceFriend.findByAccount_IdAndAccount_Id(friend, account);
+        if (friend1 == null && friend2 == null) {
             Friend newFriend = new Friend();
-            newFriend.setAccount(account1);
-            newFriend.setFriend(account2);
+            newFriend.setAccount(account);
+            newFriend.setFriend(friend);
             newFriend.setStatus(false);
             serviceFriend.save(newFriend);
             return new ResponseEntity<>("Ok", HttpStatus.OK);

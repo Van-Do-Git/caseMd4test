@@ -38,8 +38,8 @@ public class ServiceFriend implements IServiceFriend {
 
 
     @Override
-    public Friend findByAccount_IdAndAccount_Id(Long idAcc, Long idFriend) {
-        return friendRepo.findByAccount_IdAndAccount_Id(idAcc, idFriend);
+    public Friend findByAccount_IdAndAccount_Id(Account account, Account friend) {
+        return friendRepo.findByAccount_IdAndAccount_Id(account,friend);
     }
 
     @Override
