@@ -3,8 +3,10 @@ package com.codegym.casemd4.controller;
 import com.codegym.casemd4.dto.LoginAccount;
 import com.codegym.casemd4.model.Account;
 import com.codegym.casemd4.model.AppRole;
+import com.codegym.casemd4.model.Image;
 import com.codegym.casemd4.service.account.IServiceAccount;
 import com.codegym.casemd4.service.approle.IServiceAppRole;
+import com.codegym.casemd4.service.image.IServiceImage;
 import com.codegym.casemd4.service.jwt.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,6 +29,8 @@ public class SignUpController {
     @Autowired
     IServiceAppRole serviceAppRole;
     @Autowired
+    IServiceImage serviceImage;
+    @Autowired
     JwtService jwtService;
 
 
@@ -34,6 +38,8 @@ public class SignUpController {
     public ResponseEntity<String> createAcc(@Valid @RequestBody Account account) {
         String message = "";
         AppRole role = serviceAppRole.findById(2L).get();
+        Image image = serviceImage.findById(1L).get();
+        account.setAvatar(image);
         account.setRole(role);
         if (serviceAccount.add(account)) {
             message = "Ok";

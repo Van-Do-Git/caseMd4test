@@ -1,12 +1,14 @@
 package com.codegym.casemd4.service.friend;
 
 
+import com.codegym.casemd4.model.Account;
 import com.codegym.casemd4.model.AccountLike;
 import com.codegym.casemd4.model.Friend;
 import com.codegym.casemd4.repository.IFriendRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -39,4 +41,16 @@ public class ServiceFriend implements IServiceFriend {
     public Friend findByAccount_IdAndAccount_Id(Long idAcc, Long idFriend) {
         return friendRepo.findByAccount_IdAndAccount_Id(idAcc, idFriend);
     }
+
+    @Override
+    public List<Friend> findAllByIdAcc(Account account, Boolean status1, Account friend, Boolean status2) {
+        return friendRepo.findAllByIdAcc(account,status1,friend,status2);
+    }
+
+    @Override
+    public List<Friend> findFriendByIdAcc(Account account, Boolean status1) {
+        return friendRepo.findFriendByIdAcc(account,status1);
+    }
+
+
 }

@@ -20,6 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -66,14 +68,8 @@ public class AccountController {
     @PostMapping("/timeline")
     public ResponseEntity<Page<Post>> timeline(@RequestBody String page) {
         String[] sortById = new String[2];
-        Pageable pageable = PageRequest.of(Integer.parseInt(page), 20, Sort.by("id").descending());
+        Pageable pageable = PageRequest.of(Integer.parseInt(page), 3, Sort.by("id").descending());
         Page<Post> postPage = servicePost.findAll(pageable);
-        return new ResponseEntity<>(postPage, HttpStatus.OK);
-    }
-
-    @GetMapping("/test{page}")
-    public ResponseEntity<Page<Post>> test(@PageableDefault(size = 12) Pageable page, String s) {
-        Page<Post> postPage = servicePost.findPostByPrivacyContaining(s, page);
         return new ResponseEntity<>(postPage, HttpStatus.OK);
     }
 
@@ -136,6 +132,36 @@ public class AccountController {
             return new ResponseEntity<>("Ok", HttpStatus.OK);
         }
         return new ResponseEntity<>("exits", HttpStatus.OK);
+    }
+
+    @GetMapping("/showfriend/{idAcc}")
+    public ResponseEntity<List<Account>> showListFriend(@PathVariable("idAcc") Long idAcc) {
+        Account account = serviceAccount.findById(idAcc).get();
+        List<Friend> list = serviceFriend.findAllByIdAcc(account, true, account, true);
+        List<Account> accountList = new ArrayList<>();
+        if (list != null) {
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).getAccount().getId() == idAcc) {
+                    accountList.add(list.get(i).getFriend());
+                } else {
+                    accountList.add(list.get(i).getAccount());
+                }
+            }
+        }
+        return new ResponseEntity<>(accountList, HttpStatus.OK);
+    }
+
+    @GetMapping("/showrequestfriend/{idAcc}")
+    public ResponseEntity<List<Account>> showRequestFriend(@PathVariable("idAcc") Long idAcc) {
+        Account account = serviceAccount.findById(idAcc).get();
+        List<Friend> list = serviceFriend.findFriendByIdAcc(account, false);
+        List<Account> accountList = new ArrayList<>();
+        if (list != null) {
+            for (int i = 0; i < list.size(); i++) {
+                accountList.add(list.get(i).getAccount());
+            }
+        }
+        return new ResponseEntity<>(accountList, HttpStatus.OK);
     }
 
 }
