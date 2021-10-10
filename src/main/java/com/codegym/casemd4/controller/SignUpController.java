@@ -4,10 +4,12 @@ import com.codegym.casemd4.dto.LoginAccount;
 import com.codegym.casemd4.model.Account;
 import com.codegym.casemd4.model.AppRole;
 import com.codegym.casemd4.model.Image;
+import com.codegym.casemd4.model.Post;
 import com.codegym.casemd4.service.account.IServiceAccount;
 import com.codegym.casemd4.service.approle.IServiceAppRole;
 import com.codegym.casemd4.service.image.IServiceImage;
 import com.codegym.casemd4.service.jwt.JwtService;
+import com.codegym.casemd4.service.post.IServicePost;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -30,6 +33,8 @@ public class SignUpController {
     IServiceAppRole serviceAppRole;
     @Autowired
     IServiceImage serviceImage;
+    @Autowired
+    IServicePost servicePost;
     @Autowired
     JwtService jwtService;
 
@@ -46,6 +51,7 @@ public class SignUpController {
         } else message = "account exited!";
         return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
@@ -81,6 +87,34 @@ public class SignUpController {
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         }
         return new ResponseEntity<>(result, httpStatus);
+    }
+
+    @GetMapping("/addroleandimage")
+    public ResponseEntity<String> fixRoleAndDefaultAvatar() {
+        List<AppRole> appRoles = (List<AppRole>) serviceAppRole.findAll();
+        List<Image> images = (List<Image>) serviceImage.findAll();
+        if (appRoles == null) {
+            AppRole admin = new AppRole();
+            admin.setId(1L);
+            admin.setRole("ROLE_ADMIN");
+            AppRole user = new AppRole();
+            user.setRole("ROLE_USER");
+            user.setId(2L);
+            serviceAppRole.save(admin);
+            serviceAppRole.save(user);
+        }
+        if (images == null) {
+            Image image = new Image();
+            Post post = new Post();
+            post.setId(1L);
+            post.setPrivacy("avatarmacdinh");
+            post.setConten("Avatar default");
+            servicePost.save(post);
+            image.setId(1L);
+            image.setPath("https://firebasestorage.googleapis.com/v0/b/filebase-70567.appspot.com/o/images%2F84156601_1148106832202066_479016465572298752_o.jpg?alt=media&token=4ca2d074-2b3b-4524-a017-e951067fa3f5");
+            serviceImage.save(image);
+        }
+        return new ResponseEntity<>("ok", HttpStatus.OK);
     }
 
 }
