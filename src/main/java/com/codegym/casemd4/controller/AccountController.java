@@ -68,7 +68,7 @@ public class AccountController {
     public ResponseEntity<Page<Post>> timeline(@RequestBody String page) {
         String[] sortById = new String[2];
         Pageable pageable = PageRequest.of(Integer.parseInt(page), 5, Sort.by("id").descending());
-        Page<Post> postPage = servicePost.findPostByPrivacyContaining("public",pageable);
+        Page<Post> postPage = servicePost.findPostByPrivacyContaining("public", pageable);
         return new ResponseEntity<>(postPage, HttpStatus.OK);
     }
 
@@ -204,6 +204,12 @@ public class AccountController {
         newAvatar.setPost(post);
         account.setAvatar(newAvatar);
         serviceAccount.save(account);
+        return new ResponseEntity<>("ok", HttpStatus.OK);
+    }
+
+    @GetMapping("/deletepost/{idPost}")
+    public ResponseEntity<String> deletePost(@PathVariable Long idPost) {
+        servicePost.remove(idPost);
         return new ResponseEntity<>("ok", HttpStatus.OK);
     }
 
