@@ -89,11 +89,11 @@ public class SignUpController {
         return new ResponseEntity<>(result, httpStatus);
     }
 
-    @GetMapping("/addroleandimage")
+    @PutMapping("/addroleandimage")
     public ResponseEntity<String> fixRoleAndDefaultAvatar() {
         List<AppRole> appRoles = (List<AppRole>) serviceAppRole.findAll();
         List<Image> images = (List<Image>) serviceImage.findAll();
-        if (appRoles == null) {
+        if (appRoles.size() == 0) {
             AppRole admin = new AppRole();
             admin.setId(1L);
             admin.setRole("ROLE_ADMIN");
@@ -103,18 +103,15 @@ public class SignUpController {
             serviceAppRole.save(admin);
             serviceAppRole.save(user);
         }
-        if (images == null) {
+        if (images.size() == 0) {
             Image image = new Image();
-            Post post = new Post();
-            post.setId(1L);
-            post.setPrivacy("avatarmacdinh");
-            post.setConten("Avatar default");
-            servicePost.save(post);
             image.setId(1L);
             image.setPath("https://firebasestorage.googleapis.com/v0/b/filebase-70567.appspot.com/o/images%2F84156601_1148106832202066_479016465572298752_o.jpg?alt=media&token=4ca2d074-2b3b-4524-a017-e951067fa3f5");
             serviceImage.save(image);
         }
         return new ResponseEntity<>("ok", HttpStatus.OK);
     }
+
+
 
 }

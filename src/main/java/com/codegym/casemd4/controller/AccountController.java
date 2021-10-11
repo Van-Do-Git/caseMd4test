@@ -213,4 +213,13 @@ public class AccountController {
         return new ResponseEntity<>("ok", HttpStatus.OK);
     }
 
+    @DeleteMapping("/refuse/{idAcc}/{idFriend}")
+    public ResponseEntity<String> refuseFriend(@PathVariable("idAcc") Long idAcc, @PathVariable("idFriend") Long idFriend) {
+        Account account = serviceAccount.findById(idAcc).get();
+        Account friend = serviceAccount.findById(idFriend).get();
+        Friend f = serviceFriend.findByAccount_IdAndAccount_Id(friend, account);
+        serviceFriend.remove(f.getId());
+        return new ResponseEntity<>("ok", HttpStatus.OK);
+    }
+
 }
