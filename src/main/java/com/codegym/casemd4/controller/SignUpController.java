@@ -62,7 +62,7 @@ public class SignUpController {
             verifiAccount.setToken(token);
             VerifiAccount newVerifi = verifiService.add(verifiAccount);
             SimpleMailMessage sendmail = new SimpleMailMessage();
-            sendmail.setTo("mittervan@gmail.com");
+            sendmail.setTo(account.getEmail());
             sendmail.setSubject("Bấm vào link bên dưới để xác thực email!");
             sendmail.setText("https://vilo-vn.herokuapp.com/account/verification/" + newVerifi.getId() + "/" + acc.getId() + "?token=" + token);
             javaMailSender.send(sendmail);
