@@ -23,6 +23,7 @@ public class Account {
     private String password;
     private String re_password;
     private String phoneNumber;
+    private Boolean enable;
     @NotBlank
     private String fullName;
     private Date dateOfBirth;

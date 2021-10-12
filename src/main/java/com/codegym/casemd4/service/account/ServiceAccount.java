@@ -5,15 +5,18 @@ import com.codegym.casemd4.model.Account;
 import com.codegym.casemd4.repository.IAccountRepo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ServiceAccount implements IServiceAccount{
+public class ServiceAccount implements IServiceAccount {
     @Autowired
     private IAccountRepo accountRepo;
+
     @Override
     public Iterable<Account> findAll() {
         return accountRepo.findAll();
@@ -44,7 +47,7 @@ public class ServiceAccount implements IServiceAccount{
         List<Account> listUser = accountRepo.findAll();
         for (Account userExist : listUser) {
             if (StringUtils.equals(account.getEmail(), userExist.getEmail())
-                    && StringUtils.equals(account.getPassword(), userExist.getPassword())) {
+                    && StringUtils.equals(account.getPassword(), userExist.getPassword()) && userExist.getEnable()) {
                 return true;
             }
         }
@@ -56,8 +59,8 @@ public class ServiceAccount implements IServiceAccount{
         List<Account> listUser = accountRepo.findAll();
         for (Account userExist : listUser) {
             if (account.getId() == userExist.getId() ||
-                    StringUtils.equals(account.getEmail(), userExist.getEmail())||
-                    !StringUtils.equals(account.getPassword(),account.getRe_password())) {
+                    StringUtils.equals(account.getEmail(), userExist.getEmail()) ||
+                    !StringUtils.equals(account.getPassword(), account.getRe_password())) {
                 return false;
             }
         }

@@ -4,15 +4,18 @@ import com.codegym.casemd4.dto.LoginAccount;
 import com.codegym.casemd4.model.Account;
 import com.codegym.casemd4.model.AppRole;
 import com.codegym.casemd4.model.Image;
-import com.codegym.casemd4.model.Post;
+import com.codegym.casemd4.model.VerifiAccount;
 import com.codegym.casemd4.service.account.IServiceAccount;
 import com.codegym.casemd4.service.approle.IServiceAppRole;
 import com.codegym.casemd4.service.image.IServiceImage;
 import com.codegym.casemd4.service.jwt.JwtService;
 import com.codegym.casemd4.service.post.IServicePost;
+import com.codegym.casemd4.service.verify.IVerifiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +40,8 @@ public class SignUpController {
     IServicePost servicePost;
     @Autowired
     JwtService jwtService;
+    @Autowired
+    IVerifiService verifiService;
 
 
     @PostMapping("/signup")
@@ -46,8 +51,20 @@ public class SignUpController {
         Image image = serviceImage.findById(1L).get();
         account.setAvatar(image);
         account.setRole(role);
+        account.setEnable(false);
         if (serviceAccount.add(account)) {
-            message = "Ok";
+            Account acc = serviceAccount.loadUserByEmail(account.getEmail());
+            String token = jwtService.generateTokenLogin(account.getEmail());
+            VerifiAccount verifiAccount = new VerifiAccount();
+            verifiAccount.setIdAcc(acc.getId());
+            verifiAccount.setToken(token);
+            VerifiAccount newVerifi = verifiService.add(verifiAccount);
+            SimpleMailMessage sendmail = new SimpleMailMessage();
+            sendmail.setTo("mittervan@gmail.com");
+            sendmail.setSubject("Bấm vào link bên dưới để xác thực email!");
+            sendmail.setText("https://vilo-vn.herokuapp.com/account/verification/" + newVerifi.getId() + "/" + acc.getId() + "?tocke=" + token);
+            javaMailSender.send(sendmail);
+            message = "Check email to verification!";
         } else message = "account exited!";
         return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
@@ -79,7 +96,7 @@ public class SignUpController {
                 loginAccount.setToken(result);
                 return new ResponseEntity(loginAccount, HttpStatus.OK);
             } else {
-                result = "Wrong userId and password";
+                result = "Wrong email or password or not verification";
                 httpStatus = HttpStatus.BAD_REQUEST;
             }
         } catch (Exception ex) {
@@ -112,6 +129,19 @@ public class SignUpController {
         return new ResponseEntity<>("ok", HttpStatus.OK);
     }
 
+    @Autowired
+    JavaMailSender javaMailSender;
 
+    @GetMapping("/verification/{id}/{idAcc}")
+    public ResponseEntity<String> verification(@RequestParam("token") String token, @PathVariable("id") Long id, @PathVariable("idAcc") Long idAcc) {
+        VerifiAccount verifiAccount = verifiService.findById(id).get();
+        Account account = serviceAccount.findById(idAcc).get();
+        if (verifiAccount.getToken().equals(token)) {
+            account.setEnable(true);
+            serviceAccount.save(account);
+            return new ResponseEntity<>("Bấm vào link để đăng nhập https://fakeface.netlify.app/", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Xác thực hết hiệu lực!", HttpStatus.OK);
+    }
 
 }
