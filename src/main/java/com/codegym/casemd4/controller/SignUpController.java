@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,8 +54,9 @@ public class SignUpController {
         account.setRole(role);
         account.setEnable(false);
         if (serviceAccount.add(account)) {
+            String str = "GP Coder";
             Account acc = serviceAccount.loadUserByEmail(account.getEmail());
-            String token = jwtService.generateTokenLogin(account.getEmail());
+            String token = Base64.getEncoder().encodeToString(account.getEmail().getBytes());
             VerifiAccount verifiAccount = new VerifiAccount();
             verifiAccount.setIdAcc(acc.getId());
             verifiAccount.setToken(token);
@@ -62,7 +64,7 @@ public class SignUpController {
             SimpleMailMessage sendmail = new SimpleMailMessage();
             sendmail.setTo("mittervan@gmail.com");
             sendmail.setSubject("Bấm vào link bên dưới để xác thực email!");
-            sendmail.setText("https://vilo-vn.herokuapp.com/account/verification/" + newVerifi.getId() + "/" + acc.getId() + "?tocke=" + token);
+            sendmail.setText("https://vilo-vn.herokuapp.com/account/verification/" + newVerifi.getId() + "/" + acc.getId() + "?token=" + token);
             javaMailSender.send(sendmail);
             message = "Check email to verification!";
         } else message = "account exited!";
